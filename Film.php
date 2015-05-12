@@ -14,12 +14,16 @@ class Film {
 		phpQuery::newDocumentFile($this->url);
 
 		$this->title = pq("table[bgcolor='#C0C0C0'] tr:first td")->text();
-		$this->finish = !strpos($this->title, "更新");
+		$this->getFinish( $this->title );
 		$this->album = self::$baseUrl.pq("td[rowspan=7] img")->attr("src");
 		$this->description = $this->getDescrip();
 		$this->urls = $this->getUrls();
 		$this->getInfo();
 		$this->navigator();
+	}
+
+	private function getFinish( $title ) {
+		$this->finish = strpos($title, "更新") === false || strpos($title, "完结") !== false;
 	}
 
 	private function getInfo() {
@@ -28,23 +32,35 @@ class Film {
 			if( $i===count($elements) ) break;
 			foreach( pq("td", $row) as $j => $col ) {
 				if( $j != 1 ) continue;
-				$this->{$elements[$i]} = pq($col)->text();
+				$val = trim(pq($col)->text(), "  　\r\n\t");
+
+				switch($i) {
+					case 0: $this->{$elements[$i]} = strtotime($val); break;
+					case 3: 
+						preg_match("/([\d\.]*?)\//", $val, $rate);
+						$this->{$elements[$i]} = isset($rate[1]) ? (float)$rate[1] : 0;
+						break;
+					case 6: $this->{$elements[$i]} = (int) $val; break;
+					default: $this->{$elements[$i]} = $val; break;
+				}
 				break;
 			}
 		}
 	}
+
 	private function getDescrip() {
-		$des = preg_split ("/\s+/", pq(".con")->text());
-		array_shift($des);
-		array_pop($des);
-		return implode("", $des);		
+		$des = pq(".con")->html();
+		$des = preg_replace("/\[注：建议用迅雷下载.+$/i", "", $des);
+		$des = str_replace("剧情简介：", "", $des);
+		$des = trim($des, "  　\t\r\n<br><b></b>");
+		return strpos($des, "<br>") ? $des : preg_replace("/[\r\n]+?\s*[\r\n]+?/", "<br>", $des);		
 	}
 
 	private function getUrls() {
 		$urls = array();
 		foreach( pq(".jc a") as $url ) {
 			$url = pq($url);
-			$urls[ $url->text() ] = $url->attr("href");
+			$urls[ trim($url->text()) ] = $url->attr("href");
 		}
 		return $urls;
 	}
