@@ -32,7 +32,7 @@ class Film {
 			if( $i===count($elements) ) break;
 			foreach( pq("td", $row) as $j => $col ) {
 				if( $j != 1 ) continue;
-				$val = trim(pq($col)->text(), "  　\r\n\t");
+				$val = trim(pq($col)->text(), "  \r\n\t");
 
 				switch($i) {
 					case 0: $this->{$elements[$i]} = strtotime($val); break;
@@ -52,7 +52,7 @@ class Film {
 		$des = pq(".con")->html();
 		$des = preg_replace("/\[注：建议用迅雷下载.+$/i", "", $des);
 		$des = str_replace("剧情简介：", "", $des);
-		$des = trim($des, "  　\t\r\n<br><b></b>");
+		$des = trim($des, " \t\r\n<br><b></b>");
 		return strpos($des, "<br>") ? $des : preg_replace("/[\r\n]+?\s*[\r\n]+?/", "<br>", $des);		
 	}
 

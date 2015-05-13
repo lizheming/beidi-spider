@@ -1,11 +1,13 @@
 <?php 
 include "Film.php";
 
-$id = 0;
+$id = 41;
 do {
-	$film = new Film($id);
 	try {
-		if( $film->title === "" ) throw new Exception("$id no result");
+		$film = new Film($id);
+		if( $film->title === "") {
+			throw new Exception("$id no result");
+		}
 		echo $film;
 		file_put_contents("film/$id.json", $film);
 		$id = $film->prev;
