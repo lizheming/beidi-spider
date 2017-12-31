@@ -9,7 +9,7 @@
 
 ## 效果预览
 
-![](https://git.cugbteam.org/lizheming/Beidi-Spider/raw/master/preview.png)
+![](http://git.eming.li/lizheming/beidi-spider/raw/master/preview.png)
 
 ## 其它
 
